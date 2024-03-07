@@ -1,0 +1,12 @@
+http:
+   host: "localhost"
+   port: "8081"
+   path: "/insert"
+   
+   
+db:
+   host: "localhost"
+   port: "8081"
+   user: "root"
+   pass: "Myroot8?"
+   dbName: "online_shopping_b33"

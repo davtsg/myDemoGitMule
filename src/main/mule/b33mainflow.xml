@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c47a2ab5-c412-4a56-b9a4-cec9ff350fea" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="14c8886f-ab67-48e3-9ca7-f0669749f2b9" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Myroot8?" database="online_shopping_b33" />
+	</db:config>
+	<flow name="b33mainflowFlow" doc:id="7114efca-d506-41b0-9950-2bf8fa27d958" >
+		<http:listener doc:name="Listenerproduct" doc:id="666f6321-0190-41f7-bd3b-271f1049b32a" path="/insert" outputMimeType="application/json" outputEncoding="US-ASCII" config-ref="HTTP_Listener_config"/>
+		<db:insert doc:name="InsertProduct" doc:id="6b80054f-84b3-4e5e-a436-b9bdd10efd2a" queryTimeout="1000" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO tb_product1(product_name, descriptions, video_url, categoryid, price) VALUES  (:product_name, :descriptions, 
+:video_url, :categoryid, :price)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+product_name:  payload.product_name,
+descriptions:  payload.descriptions,
+video_url:  payload.video_url,
+categoryid:  payload.categoryid,
+price:  payload.price
+}]]]></db:input-parameters>
+		</db:insert>
+		<set-payload value='#["DATA ENTERED!"]' doc:name="Set Payload" doc:id="5843fd46-0186-4437-8ca4-321d713b028f" />
+	</flow>
+	<flow name="b33mainflowFlow1" doc:id="ae110d7e-64dc-41fb-b17f-585cbfff438d" >
+		<http:listener doc:name="Listener" doc:id="08479565-034e-426a-84ae-613944c493db" path="/select"/>
+		<db:select doc:name="Select" doc:id="6a9f02ed-5b1c-4c97-be47-e91018eac503" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM tb_product1]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="39eec743-b457-4f8a-83c3-b8eceeb7586f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
